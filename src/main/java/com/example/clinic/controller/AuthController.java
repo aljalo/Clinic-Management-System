@@ -1,6 +1,7 @@
 package com.example.clinic.controller;
 
 import com.example.clinic.dto.LoginRequest;
+import com.example.clinic.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,23 +15,19 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest request) {
 
-        try {
-            Authentication authentication =
-                    authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    request.getUsername(),
-                                    request.getPassword()
-                            )
-                    );
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                request.getUsername(),
+                                request.getPassword()
+                        )
+                );
 
-            return "Login successful for user: " + authentication.getName();
-
-        } catch (AuthenticationException e) {
-            throw new RuntimeException("Invalid username or password");
-        }
+        return jwtUtil.generateToken(authentication.getName());
     }
 }
