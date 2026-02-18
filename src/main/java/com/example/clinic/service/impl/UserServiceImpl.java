@@ -2,6 +2,8 @@ package com.example.clinic.service.impl;
 
 import com.example.clinic.entity.Role;
 import com.example.clinic.entity.User;
+import com.example.clinic.exception.DuplicateUserException;
+import com.example.clinic.exception.UserNotFoundException;
 import com.example.clinic.repository.UserRepository;
 
 import com.example.clinic.service.UserService;
@@ -19,7 +21,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(String username, String password, String role){
         if (userRepository.findByUsername(username).isPresent()){
-            throw new RuntimeException("Username already exists");
+            throw new DuplicateUserException("Username already exists");
         }
 
         Role userRole = Role.valueOf(role.toUpperCase());
@@ -34,6 +36,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Username not found"));
+                .orElseThrow(() -> new UserNotFoundException("Username not found"));
     }
 }
