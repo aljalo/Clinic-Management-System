@@ -32,18 +32,19 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public Page<PatientResponse> getAllPatients(Pageable pageable) {
 
-        return patientRepository.findAll(pageable)
+        return patientRepository.findAllByDeletedFalse(pageable)
                 .map(patientMapper::toResponse);
     }
 
-    @Override
-    public PatientResponse getPatientById(Long id) {
+@Override
+public PatientResponse getPatientById(Long id) {
 
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Patient not found"));
+    Patient patient = patientRepository.findByIdAndDeletedFalse(id)
+            .orElseThrow(() -> new UserNotFoundException("Patient not found"));
 
-        return patientMapper.toResponse(patient);
-    }
+    return patientMapper.toResponse(patient);
+}
+
 
     @Override
     public PatientResponse updatePatient(Long id, PatientRequest request) {
@@ -57,13 +58,21 @@ public class PatientServiceImpl implements PatientService {
 
         return patientMapper.toResponse(updated);
     }
+    @Override
+    public Page<PatientResponse> searchByName(String name, Pageable pageable) {
+        return patientRepository
+                .findByFirstNameContainingIgnoreCaseAndDeletedFalse(name, pageable)
+                .map(patientMapper::toResponse);
+    }
 
     @Override
     public void deletePatient(Long id) {
 
-        Patient patient = patientRepository.findById(id)
+        Patient patient = patientRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new UserNotFoundException("Patient not found"));
 
-        patientRepository.delete(patient);
+        patient.setDeleted(true);
+        patientRepository.save(patient);
     }
+
 }

@@ -40,6 +40,13 @@ public class PatientController {
 
         return patientService.updatePatient(id, request);
     }
+    @GetMapping("/search")
+    public PageResponse<PatientResponse> search(
+            @RequestParam String name,
+            Pageable pageable
+    ){
+        return PageResponse.from( patientService.searchByName(name, pageable));
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

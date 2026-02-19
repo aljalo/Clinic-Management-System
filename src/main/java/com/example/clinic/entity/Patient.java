@@ -19,6 +19,9 @@ public class Patient {
     private Long id;
 
     @Column(nullable = false)
+    private boolean deleted = false;
+
+    @Column(nullable = false)
     private String firstName;
 
     @Column(nullable = false)

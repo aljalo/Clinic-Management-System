@@ -17,4 +17,6 @@ public interface PatientService {
 
     void deletePatient(Long id);
 
+    Page<PatientResponse> searchByName(String name, Pageable pageable);
+
 }
