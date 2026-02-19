@@ -1,15 +1,20 @@
 package com.example.clinic.service;
 
 import com.example.clinic.dto.PatientRequest;
-import com.example.clinic.entity.Patient;
-
-import java.util.List;
+import com.example.clinic.dto.PatientResponse;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 public interface PatientService {
 
-    Patient createPatient(PatientRequest request);
+    PatientResponse createPatient(PatientRequest request);
 
-    List<Patient> getAllPatients();
-    Patient getPatientById(Long id);
-    void deletePatientById(Long id);
+    Page<PatientResponse> getAllPatients(Pageable pageable);
+
+    PatientResponse getPatientById(Long id);
+
+    PatientResponse updatePatient(Long id, PatientRequest request);
+
+    void deletePatient(Long id);
+
 }
