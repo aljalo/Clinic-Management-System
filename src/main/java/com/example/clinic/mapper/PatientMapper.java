@@ -13,5 +13,5 @@ public interface PatientMapper {
 
     PatientResponse toResponse(Patient patient);
 
-    void updateEntityFromRequest(PatientRequest patientRequest, @MappingTarget Patient patient);
+    void updateEntityFromRequest(PatientRequest request, @MappingTarget Patient patient);
 }
