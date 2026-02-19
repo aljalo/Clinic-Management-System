@@ -23,7 +23,7 @@ public abstract class BaseEntity {
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
-    private boolean deleted = false;
+    private Boolean deleted = false;
 
     @Version
     private Long version;

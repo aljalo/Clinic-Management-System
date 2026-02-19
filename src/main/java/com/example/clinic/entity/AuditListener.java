@@ -9,9 +9,8 @@ public class AuditListener {
 
     @PrePersist
     public void prePersist(BaseEntity entity) {
-        LocalDateTime now = LocalDateTime.now();
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
+        entity.setCreatedAt(LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now());
     }
 
     @PreUpdate
