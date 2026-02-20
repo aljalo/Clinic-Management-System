@@ -1,8 +1,17 @@
 package com.example.clinic.exception;
 
-public class UserNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
 
-    public UserNotFoundException(String message) {
-        super(message);
+/**
+ * Thrown when user entity is not found.
+ */
+public class UserNotFoundException extends BusinessException {
+
+    public UserNotFoundException(String username) {
+        super(
+                "User not found with username: " + username,
+                ErrorCode.USER_NOT_FOUND,
+                HttpStatus.NOT_FOUND
+        );
     }
 }
