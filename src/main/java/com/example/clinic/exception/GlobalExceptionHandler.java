@@ -1,61 +1,58 @@
 package com.example.clinic.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Centralized exception handling.
+ * Architect-level production ready.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(
-            UserNotFoundException ex,
+    private static final Logger log =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(
+            BusinessException ex,
             HttpServletRequest request) {
 
-        return buildErrorResponse(ex, request, HttpStatus.NOT_FOUND);
-    }
+        log.warn("Business exception: {}", ex.getMessage());
 
-    @ExceptionHandler(DuplicateUserException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateUser(
-            DuplicateUserException ex,
-            HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                ex.getStatus().value(),
+                ex.getStatus().getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                ex.getErrorCode().name()
+        );
 
-        return buildErrorResponse(ex, request, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(
-            BadCredentialsException ex,
-            HttpServletRequest request) {
-
-        return buildErrorResponse(ex, request, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(ex.getStatus()).body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(
+    public ResponseEntity<ErrorResponse> handleUnexpectedException(
             Exception ex,
             HttpServletRequest request) {
 
-        return buildErrorResponse(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        log.error("Unexpected error", ex);
 
-    private ResponseEntity<ErrorResponse> buildErrorResponse(
-            Exception ex,
-            HttpServletRequest request,
-            HttpStatus status) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                500,
+                "Internal Server Error",
+                "Unexpected error occurred",
+                request.getRequestURI(),
+                ErrorCode.INTERNAL_SERVER_ERROR.name()
+        );
 
-        ErrorResponse error = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(status.value())
-                .error(status.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
-
-        return new ResponseEntity<>(error, status);
+        return ResponseEntity.internalServerError().body(response);
     }
 }
